@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10,7 +10,7 @@
     <style>
         /* --- SISTEMA DE COLOR (VARIABLES) --- */
         :root {
-            /* Paleta Base (Light Mode por defecto) */
+            /* Paleta Base (Light Mode - INTACTO) */
             --bg-app: #f8fafc;       /* Slate-50 */
             --bg-panel: #ffffff;     /* White */
             --bg-input: #f8fafc;     /* Slate-50 */
@@ -22,48 +22,38 @@
             --border-subtle: #e2e8f0; /* Slate-200 */
             --border-focus: #3b82f6;  /* Blue-500 */
 
-            --accent-primary: #2563eb; /* Blue-600 */
-            --accent-bg: #eff6ff;      /* Blue-50 */
+            --accent-primary: #fb5a3a; /* Brightronix Orange */
+            --accent-bg: #fff1f2;      /* Orange-50 (Light) */
             
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             
-            /* --- PALETA DE COLORES RESTAURADA (Para Iconos JS/HTML) --- */
-            --blue-50: #eff6ff; 
-            --blue-100: #dbeafe; 
+            /* Colores auxiliares para botones */
             --blue-500: #3b82f6; 
-            --blue-600: #2563eb; /* EL COLOR DEL LOGO */
-            
-            --emerald-50: #ecfdf5; 
-            --emerald-100: #d1fae5; 
             --emerald-500: #10b981;
-            
-            --amber-50: #fffbeb; 
-            --amber-100: #fef3c7; 
             --amber-500: #f59e0b;
         }
 
-        /* --- DARK MODE OVERRIDES --- */
+        /* --- DARK MODE OVERRIDES (DEEP MATTE THEME) --- */
         [data-theme="dark"] {
-            --bg-app: #0f172a;       /* Slate-900 */
-            --bg-panel: #1e293b;     /* Slate-800 */
-            --bg-input: #0f172a;     /* Slate-900 (Inputs oscuros) */
+            /* 1. FONDOS: Ajustados al estilo "Matte Blue-Grey" de la imagen */
+            --bg-app: #1b212d;       /* Fondo general: Azul grisáceo profundo */
+            --bg-panel: #242a38;     /* Paneles: Un tono ligeramente más claro para contraste */
+            --bg-input: #151a23;     /* Inputs: Más oscuros para profundidad */
             
-            --text-primary: #f8fafc; /* Slate-50 */
+            /* 2. TEXTOS */
+            --text-primary: #ffffff; /* Blanco puro para máxima legibilidad */
             --text-secondary: #94a3b8; /* Slate-400 */
-            --text-muted: #64748b;   /* Slate-500 */
+            --text-muted: #58657a;   /* Gris medio */
             
-            --border-subtle: #334155; /* Slate-700 */
-            --border-focus: #60a5fa;  /* Blue-400 */
+            /* 3. BORDES */
+            --border-subtle: #2f384a; /* Gris azulado sutil */
+            --border-focus: #fb5a3a;  /* Naranja al enfocar */
 
-            --accent-primary: #60a5fa; /* Blue-400 (Más brillante para dark) */
-            --accent-bg: #172554;      /* Blue-950 */
+            /* 4. ACENTOS */
+            --accent-primary: #fb5a3a; /* Mismo Naranja */
+            --accent-bg: #3a1d18;      /* Fondo naranja muy oscuro y transparente */
             
-            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-
-            /* Ajustes sutiles para iconos en modo oscuro */
-            --blue-100: #1e3a8a;    /* Dark Blue Background */
-            --emerald-100: #064e3b; /* Dark Green Background */
-            --amber-100: #78350f;   /* Dark Amber Background */
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4); /* Sombra suave y difusa */
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -83,6 +73,37 @@
             overflow-y: auto; flex-shrink: 0; 
             box-shadow: 4px 0 24px rgba(0,0,0,0.02);
             transition: background 0.3s, border 0.3s;
+        }
+
+        /* --- LOGO STYLES (MEJORADO) --- */
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-full {
+            height: 4rem; /* AUMENTADO: Logo más grande */
+            width: auto;
+            display: block;
+            object-fit: contain;
+            transition: filter 0.3s ease;
+        }
+
+        .app-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: -0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Inversión inteligente de color para el logo en modo oscuro */
+        [data-theme="dark"] .logo-full {
+             filter: brightness(0) invert(1) opacity(0.9);
         }
 
         /* --- MAIN CONTENT --- */
@@ -147,7 +168,7 @@
         
         /* Botones Pequeños */
         .btn-icon-only { background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
-        .btn-icon-only:hover { color: #ef4444; }
+        .btn-icon-only:hover { color: var(--accent-primary); } 
 
         .btn-toggle { padding: 0.35rem 0.85rem; border-radius: 99px; font-size: 0.7rem; font-weight: 900; cursor: pointer; border: none; transition: 0.2s; }
         .btn-toggle.active { background: var(--accent-bg); color: var(--accent-primary); }
@@ -161,7 +182,7 @@
             border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: all 0.3s ease;
         }
-        .theme-btn:hover { background: var(--border-subtle); transform: rotate(15deg); }
+        .theme-btn:hover { background: var(--border-subtle); transform: rotate(15deg); color: var(--accent-primary); }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 900px) {
@@ -174,8 +195,27 @@
         /* --- PRINT --- */
         @media print {
             body > * { display: none !important; }
-            #printArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; background: white; color: black; }
+            #printArea { 
+                display: block !important; 
+                position: absolute; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                background: white; 
+                color: black; 
+                padding: 1.5rem; /* Padding general para el área de impresión */
+            }
             #printArea svg { width: 100% !important; height: auto !important; display: block; margin: 0 auto; }
+
+            /* Estilos para la tabla en el PDF */
+            #printArea table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 10pt; }
+            #printArea th, #printArea td { 
+                border: 1px solid #bbb; 
+                padding: 8px 15px; /* AUMENTADO: Más espacio horizontal entre columnas */
+                text-align: left; 
+                vertical-align: top;
+            }
+            #printArea th { background-color: #f2f2f2; font-weight: bold; }
             
             :root {
                 --bg-app: white !important;
@@ -183,9 +223,6 @@
                 --text-primary: black !important;
                 --border-subtle: #ccc !important;
             }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 2rem; font-size: 12px; }
-            .print-table th { background: #f1f5f9; text-align: left; padding: 8px; border-bottom: 2px solid #cbd5e1; font-weight: 700; color: #333; }
-            .print-table td { padding: 8px; border-bottom: 1px solid #e2e8f0; color: #333; }
         }
         #printArea { display: none; }
     </style>
@@ -193,19 +230,12 @@
 <body>
 
     <div class="sidebar">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 3rem; height: 3rem; background: var(--blue-600); border-radius: 0.85rem; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
-                    <i class="fa-solid fa-bolt" style="font-size: 1.25rem;"></i>
-                </div>
-                <div>
-                    <h1>Brightronix</h1>
-                    <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;">Wireway Calculator</div>
-                </div>
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2.5rem;">
+            
+            <div class="logo-container">
+                <img src="logo-text.png" alt="Brightronix" class="logo-full">
+                <div class="app-subtitle">Wireway Calculator</div>
             </div>
-            <button class="theme-btn" onclick="toggleTheme()" id="btnThemeToggle" title="Toggle Dark Mode">
-                <i class="fa-solid fa-moon"></i>
-            </button>
         </div>
 
         <div class="card-box" id="feederBox" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 5px solid var(--border-subtle);">
@@ -274,7 +304,7 @@
             <div>
                 <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); display:block; margin-bottom: 0.5rem; text-transform: uppercase;">Visual Layout</span>
                 <div class="card-box" style="padding: 2rem; position: relative;">
-                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--blue-500), var(--emerald-500)); opacity: 1;"></div>
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: var(--accent-primary); opacity: 1;"></div>
                     <div id="svgContainer" style="width: 100%; overflow-x: auto; padding-top: 1rem;"></div>
                 </div>
             </div>
