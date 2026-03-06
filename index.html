@@ -1,243 +1,86 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brightronix WWC - Dark Mode Ready</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <title>Brightronix Room Designer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        /* --- SISTEMA DE COLOR (VARIABLES) --- */
-        :root {
-            /* Paleta Base (Light Mode por defecto) */
-            --bg-app: #f8fafc;       /* Slate-50 */
-            --bg-panel: #ffffff;     /* White */
-            --bg-input: #f8fafc;     /* Slate-50 */
-            
-            --text-primary: #0f172a; /* Slate-900 */
-            --text-secondary: #64748b; /* Slate-500 */
-            --text-muted: #94a3b8;   /* Slate-400 */
-            
-            --border-subtle: #e2e8f0; /* Slate-200 */
-            --border-focus: #3b82f6;  /* Blue-500 */
-
-            --accent-primary: #2563eb; /* Blue-600 */
-            --accent-bg: #eff6ff;      /* Blue-50 */
-            
-            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            
-            /* --- PALETA DE COLORES RESTAURADA (Para Iconos JS/HTML) --- */
-            --blue-50: #eff6ff; 
-            --blue-100: #dbeafe; 
-            --blue-500: #3b82f6; 
-            --blue-600: #2563eb; /* EL COLOR DEL LOGO */
-            
-            --emerald-50: #ecfdf5; 
-            --emerald-100: #d1fae5; 
-            --emerald-500: #10b981;
-            
-            --amber-50: #fffbeb; 
-            --amber-100: #fef3c7; 
-            --amber-500: #f59e0b;
-        }
-
-        /* --- DARK MODE OVERRIDES --- */
-        [data-theme="dark"] {
-            --bg-app: #0f172a;       /* Slate-900 */
-            --bg-panel: #1e293b;     /* Slate-800 */
-            --bg-input: #0f172a;     /* Slate-900 (Inputs oscuros) */
-            
-            --text-primary: #f8fafc; /* Slate-50 */
-            --text-secondary: #94a3b8; /* Slate-400 */
-            --text-muted: #64748b;   /* Slate-500 */
-            
-            --border-subtle: #334155; /* Slate-700 */
-            --border-focus: #60a5fa;  /* Blue-400 */
-
-            --accent-primary: #60a5fa; /* Blue-400 (Más brillante para dark) */
-            --accent-bg: #172554;      /* Blue-950 */
-            
-            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-
-            /* Ajustes sutiles para iconos en modo oscuro */
-            --blue-100: #1e3a8a;    /* Dark Blue Background */
-            --emerald-100: #064e3b; /* Dark Green Background */
-            --amber-100: #78350f;   /* Dark Amber Background */
-        }
-
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            margin: 0; font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-app); color: var(--text-primary); 
-            height: 100vh; display: flex; overflow: hidden; 
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        /* --- SIDEBAR --- */
-        .sidebar { 
-            width: 380px; background: var(--bg-panel); 
-            border-right: 1px solid var(--border-subtle); 
-            display: flex; flex-direction: column; z-index: 20; padding: 2rem; 
-            overflow-y: auto; flex-shrink: 0; 
-            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
-            transition: background 0.3s, border 0.3s;
-        }
-
-        /* --- MAIN CONTENT --- */
-        .main-content { 
-            flex: 1; display: flex; flex-direction: column; 
-            background: var(--bg-app); overflow: hidden; position: relative;
-            transition: background 0.3s;
-        }
-
-        /* Top Bar */
-        .top-bar {
-            background: var(--bg-panel); border-bottom: 1px solid var(--border-subtle); 
-            padding: 1.25rem 2rem; display: flex; justify-content: space-between; 
-            align-items: center; flex-shrink: 0; z-index: 10;
-            transition: background 0.3s, border 0.3s;
-        }
-
-        .workspace { padding: 2rem; overflow-y: auto; flex: 1; scroll-behavior: smooth; }
-
-        /* --- TEXTOS --- */
-        h1 { font-size: 1.25rem; font-weight: 900; margin: 0; color: var(--text-primary); letter-spacing: -0.02em; }
-        h2 { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 2rem 0 1rem 0; }
-        
-        /* --- TARJETAS --- */
-        .card-box { 
-            background: var(--bg-panel); border-radius: 1rem; 
-            border: 1px solid var(--border-subtle); 
-            box-shadow: var(--shadow-card);
-            transition: background 0.3s, border 0.3s;
-        }
-
-        /* --- BOTONES DE ACCIÓN --- */
-        .btn-add {
-            width: 100%; padding: 1.25rem;
-            border: 1px solid var(--border-subtle); background: var(--bg-panel);
-            border-radius: 1rem; color: var(--text-secondary); font-weight: 700; font-size: 0.95rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 1rem;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 0.75rem;
-        }
-        .btn-add:hover { 
-            border-color: var(--border-focus); color: var(--accent-primary); 
-            background: var(--bg-app); transform: translateY(-1px);
-        }
-
-        /* --- INPUTS --- */
-        .input-label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); display: block; margin-bottom: 0.4rem; text-transform: uppercase; }
-        
-        .input-std, .input-custom { 
-            width: 100%; padding: 0.8rem 1rem;
-            border: 1px solid var(--border-subtle); border-radius: 0.75rem; 
-            background: var(--bg-input); color: var(--text-primary); 
-            font-weight: 600; font-family: 'Inter', sans-serif; font-size: 0.9rem;
-            appearance: none; transition: 0.2s;
-        }
-        .input-std:focus, .input-custom:focus { border-color: var(--border-focus); }
-
-        /* Fix para icono del select */
-        select.input-std, select.input-custom {
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.65em auto;
-        }
-        
-        /* Botones Pequeños */
-        .btn-icon-only { background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
-        .btn-icon-only:hover { color: #ef4444; }
-
-        .btn-toggle { padding: 0.35rem 0.85rem; border-radius: 99px; font-size: 0.7rem; font-weight: 900; cursor: pointer; border: none; transition: 0.2s; }
-        .btn-toggle.active { background: var(--accent-bg); color: var(--accent-primary); }
-        .btn-toggle.inactive { background: var(--bg-input); color: var(--text-muted); }
-        .opacity-40 { opacity: 0.4; pointer-events: none; }
-
-        /* Botón Tema */
-        .theme-btn {
-            background: var(--bg-input); border: 1px solid var(--border-subtle);
-            color: var(--text-primary); width: 2.5rem; height: 2.5rem;
-            border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease;
-        }
-        .theme-btn:hover { background: var(--border-subtle); transform: rotate(15deg); }
-
-        /* --- RESPONSIVE --- */
-        @media (max-width: 900px) {
-            body { flex-direction: column; height: auto; overflow-y: auto; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-subtle); padding: 1.5rem; order: 1; }
-            .main-content { overflow: visible; order: 2; }
-            .top-bar { position: sticky; top: 0; }
-        }
-
-        /* --- PRINT --- */
-        @media print {
-            body > * { display: none !important; }
-            #printArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; background: white; color: black; }
-            #printArea svg { width: 100% !important; height: auto !important; display: block; margin: 0 auto; }
-            
-            :root {
-                --bg-app: white !important;
-                --bg-panel: white !important;
-                --text-primary: black !important;
-                --border-subtle: #ccc !important;
-            }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 2rem; font-size: 12px; }
-            .print-table th { background: #f1f5f9; text-align: left; padding: 8px; border-bottom: 2px solid #cbd5e1; font-weight: 700; color: #333; }
-            .print-table td { padding: 8px; border-bottom: 1px solid #e2e8f0; color: #333; }
-        }
-        #printArea { display: none; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <div class="sidebar">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 3rem; height: 3rem; background: var(--blue-600); border-radius: 0.85rem; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
-                    <i class="fa-solid fa-bolt" style="font-size: 1.25rem;"></i>
-                </div>
-                <div>
-                    <h1>Brightronix</h1>
-                    <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;">Wireway Calculator</div>
-                </div>
+            
+            <div class="logo-container">
+                <img src="css/logo-text.png" alt="Brightronix" class="logo-full">
+                <div class="app-subtitle">Electrical Room Designer</div>
             </div>
-            <button class="theme-btn" onclick="toggleTheme()" id="btnThemeToggle" title="Toggle Dark Mode">
+            <button id="btnThemeToggle" class="theme-btn" onclick="toggleTheme()">
                 <i class="fa-solid fa-moon"></i>
             </button>
         </div>
 
-        <div class="card-box" id="feederBox" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 5px solid var(--border-subtle);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <span style="font-weight: 800; font-size: 0.9rem; color: var(--text-primary);">MAIN FEEDER</span>
-                <button id="btnFeederToggle" class="btn-toggle active" onclick="toggleFeeder()">ON</button>
-            </div>
-            
-            <div id="feederContent">
-                <div class="input-group">
-                    <label class="input-label">Connection Type</label>
-                    <select id="feederType" class="input-std" onchange="updateFeederType()">
-                        <option value="DIRECT">Direct Pipe</option>
-                        <option value="DISCONNECT">Disconnect Switch</option>
-                        <option value="CT_CABINET">CT Cabinet</option>
-                    </select>
+        <!-- ROOM CONFIGURATION -->
+        <div class="card-box" style="padding: 1.5rem; margin-bottom: 2rem;">
+            <span class="section-title">Room Configuration</span>
+            <div style="margin-bottom: 1rem;">
+                <label class="input-label">Active Walls</label>
+                <div class="wall-selector" id="wallActivatorContainer">
+                    <!-- Generated by JS -->
                 </div>
-                <div id="feederDynamicFields"></div>
+            </div>
+            <div id="wallDimensionsContainer">
+                <!-- Generated by JS -->
             </div>
         </div>
 
         <div>
-            <h2>ADD NEW LOAD</h2>
-            <button class="btn-add" onclick="addLoad('PANELBOARD')">
-                <i class="fa-solid fa-server" style="color: var(--blue-500);"></i> Panelboard
-            </button>
-            <button class="btn-add" onclick="addLoad('DISCONNECT')">
+            <span class="section-title">Power Distribution</span>
+            <div class="grid-2">
+                <button class="btn-add btn-add-sm" onclick="addLoad('PANELBOARD')">
+                    <i class="fa-solid fa-server" style="color: var(--blue-500);"></i> Panelboard
+                </button>
+                <button class="btn-add btn-add-sm" onclick="addLoad('DISCONNECT')">
                 <i class="fa-solid fa-power-off" style="color: var(--emerald-500);"></i> Disconnect
-            </button>
-            <button class="btn-add" onclick="addLoad('METER')">
+                </button>
+                <button class="btn-add btn-add-sm" onclick="addLoad('METER')">
                 <i class="fa-solid fa-tachometer-alt" style="color: var(--amber-500);"></i> Meter
-            </button>
+                </button>
+                <button class="btn-add btn-add-sm" onclick="addLoad('CT_CABINET')">
+                <i class="fa-solid fa-box" style="color: #06b6d4;"></i> CT Cabinet
+                </button>
+                <button class="btn-add btn-add-sm" onclick="addLoad('TRANSFORMER')">
+                    <i class="fa-solid fa-bolt" style="color: #6366f1;"></i> Transformer
+                </button>
+                <button class="btn-add btn-add-sm" onclick="addLoad('WIREWAY')">
+                    <i class="fa-solid fa-grip-lines" style="color: #64748b;"></i> Wireway
+                </button>
+            </div>
+
+            <span class="section-title" style="margin-top: 1.5rem;">Low Voltage / Backboards</span>
+            <div class="grid-2">
+                <button class="btn-add btn-add-sm" onclick="addLoad('PLYWOOD_4')">
+                    <i class="fa-solid fa-border-all" style="color: var(--purple-500);"></i> Ply 4'
+                </button>
+                <button class="btn-add btn-add-sm" onclick="addLoad('PLYWOOD_8')">
+                    <i class="fa-solid fa-border-all" style="color: var(--purple-500);"></i> Ply 8'
+                </button>
+                <button class="btn-add btn-add-sm" onclick="addLoad('TTB')">
+                    <i class="fa-solid fa-network-wired" style="color: var(--purple-500);"></i> TTB
+                </button>
+                <button class="btn-add btn-add-sm" onclick="addLoad('CUSTOM_LV')">
+                    <i class="fa-solid fa-pen-ruler" style="color: var(--purple-500);"></i> Custom
+                </button>
+            </div>
+
+            <span class="section-title" style="margin-top: 1.5rem;">Layout Tools</span>
+            <div>
+                <button class="btn-add" onclick="addLoad('SPACE')">
+                    <i class="fa-solid fa-arrows-left-right-to-line" style="color: var(--text-muted);"></i> Add Space / Gap
+                </button>
+            </div>
         </div>
     </div>
 
@@ -245,37 +88,35 @@
         
         <div class="top-bar">
             <div style="flex:1;">
-                <h2 style="margin:0; font-size:1rem; color: var(--text-primary); letter-spacing: -0.01em;">DASHBOARD</h2>
-                <span id="itemsCount" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">0 Active Loads</span>
+                <h2 style="margin:0; font-size:1rem; color: var(--text-primary); letter-spacing: -0.01em;">ROOM LAYOUT</h2>
+                <span id="activeWallLabel" style="font-size: 0.8rem; color: var(--accent-primary); font-weight: 700;">Wall 1 Selected</span>
             </div>
             
             <div style="display: flex; align-items: center; gap: 2rem;">
-                <div style="text-align: right;">
-                    <div style="font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Total Length</div>
+                <div style="text-align: right; font-family: 'Inter', sans-serif;">
+                    <div style="font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Wall Usage</div>
                     <div style="display: flex; align-items: baseline; justify-content: flex-end; gap: 0.5rem;">
-                        <span id="totalIn" style="font-size: 2rem; font-weight: 900; color: var(--text-primary); letter-spacing: -0.03em;">0.0</span>
-                        <span style="font-size: 1rem; font-weight: 700; color: var(--text-muted);">in</span>
+                        <span id="wallUsagePct" style="font-size: 2rem; font-weight: 900; color: var(--text-primary); letter-spacing: -0.03em;">0%</span>
                     </div>
-                    <div id="totalFt" style="font-size: 0.85rem; font-weight: 600; color: var(--accent-primary);">0.00 FT</div>
+                    <div id="wallUsageText" style="font-size: 0.85rem; font-weight: 600; color: var(--accent-primary);">0" / 120"</div>
                 </div>
                 <div id="headerActions"></div>
             </div>
         </div>
 
         <div class="workspace">
-            
+
             <div style="margin-bottom: 2rem;">
-                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); display:block; margin-bottom: 0.5rem; text-transform: uppercase;">Load Details</span>
-                <div class="card-box" style="display: flex; flex-direction: column; overflow: hidden;">
-                    <div id="loadListContainer" style="padding: 0; max-height: 400px; overflow-y: auto;"></div>
+                <span class="section-title">Visual Layout (Elevations)</span>
+                <div class="card-box" style="padding: 1rem; position: relative; min-height: 500px; display: flex; align-items: center;">
+                    <div id="svgContainer" class="carousel-container"></div>
                 </div>
             </div>
-
+            
             <div>
-                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); display:block; margin-bottom: 0.5rem; text-transform: uppercase;">Visual Layout</span>
-                <div class="card-box" style="padding: 2rem; position: relative;">
-                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--blue-500), var(--emerald-500)); opacity: 1;"></div>
-                    <div id="svgContainer" style="width: 100%; overflow-x: auto; padding-top: 1rem;"></div>
+                <span class="section-title">Selected Wall Items</span>
+                <div class="card-box" style="display: flex; flex-direction: column; overflow: hidden;">
+                    <div id="loadListContainer" style="padding: 0; max-height: 400px; overflow-y: auto;"></div>
                 </div>
             </div>
 
