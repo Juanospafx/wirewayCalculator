@@ -1,4 +1,4 @@
-/* --- CONSTANTES GLOBALES --- */
+﻿/* --- CONSTANTES GLOBALES --- */
 // Room Designer Constants
 const RD_DISCONNECT_DATA = { "200": 20, "400": 26, "600": 30, "800": 32, "1000": 34, "1200": 36, "1600": 40, "2000": 44, "2500": 48 };
 const RD_PANEL_DATA = { "200": 22, "225": 24, "250": 26, "400": 30, "600": 36, "800": 42 };
@@ -8,19 +8,8 @@ const RD_PANEL_AMPS_SORTED = Object.keys(RD_PANEL_DATA).map(Number).sort((a,b) =
 const RD_AMP_OPTIONS = [200, 400, 600, 800, 1000, 1200, 1600, 2000, 2500];
 const RD_CT_CABINET_OPTIONS = [600, 800, 1000, 1200];
 
-// Wireway Calculator Constants
-const WC_DISCONNECT_DATA = { "200": 20, "400": 26, "600": 30, "800": 32, "1000": 34, "1200": 36, "1600": 40, "2000": 44, "2500": 48 };
-const WC_PANEL_DATA = { "200": 22, "225": 24, "250": 26, "400": 30, "600": 36, "800": 42 };
-const WC_DISCONNECT_AMPS_SORTED = Object.keys(WC_DISCONNECT_DATA).map(Number).sort((a,b) => a-b);
-const WC_PANEL_AMPS_SORTED = Object.keys(WC_PANEL_DATA).map(Number).sort((a,b) => a-b);
-const WC_AMP_OPTIONS = [200, 400, 600, 800, 1000, 1200, 1600, 2000, 2500];
-const WC_CT_CABINET_OPTIONS = [600, 800]; // Simplificado a 600A y 800A+
-const WC_CONDUIT_SIZES = [2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0];
-const WC_DEFAULT_SPACING = 3; 
-
-/* --- ESTADO GLOBAL DE LA APLICACIÓN --- */
+/* --- ESTADO GLOBAL DE LA APLICACION --- */
 let appState = {
-    currentView: 'ROOM_DESIGNER',
     theme: 'light',
     roomDesigner: {
         walls: [
@@ -30,80 +19,23 @@ let appState = {
             { id: 4, name: 'West',  active: false, width: 120, height: 96, items: [] }
         ],
         activeWallId: 1,
-    },
-    wirewayCalculator: {
-        isFeederEnabled: true,
-        feeder: { 
-            type: 'DIRECT', 
-            conduitSize: 4.0, 
-            sets: 1, 
-            amps: 200,
-            startGap: WC_DEFAULT_SPACING,
-            betweenGap: WC_DEFAULT_SPACING,
-            gapAfter: WC_DEFAULT_SPACING
-        },
-        loads: [],
     }
 };
 
-/* --- INICIALIZACIÓN Y CONTROLADORES GLOBALES --- */
+/* --- INICIALIZACION Y CONTROLADORES GLOBALES --- */
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     applyTheme(savedTheme);
 
-    // Initialize default view (Room Designer)
     rd_renderWallControls();
     rd_calculateAndRender();
     rd_renderExportButton();
 
-    // Prepare other view (Wireway Calculator)
-    wc_renderFeederInputs();
-    wc_calculateAndRender();
-    wc_renderExportButton();
-
-    // Set initial view correctly
-    switchView('ROOM_DESIGNER', true);
-
-    // Close modal on outside click
     document.addEventListener('click', (e) => {
         const modal = document.getElementById('customModal');
         if(modal && e.target === modal) closeModal();
     });
-
-    // Add horizontal scroll with mouse wheel for WC visualizer
-    const wcSvgContainer = document.getElementById('wc-svgContainer');
-    if (wcSvgContainer) {
-        wcSvgContainer.addEventListener('wheel', (event) => {
-            if (event.deltaY !== 0 && wcSvgContainer.scrollWidth > wcSvgContainer.clientWidth) {
-                event.preventDefault();
-                wcSvgContainer.scrollLeft += event.deltaY;
-            }
-        }, { passive: false });
-    }
 });
-
-function switchView(viewName, isInitial = false) {
-    if (!isInitial && appState.currentView === viewName) return;
-    appState.currentView = viewName;
-
-    const isRD = viewName === 'ROOM_DESIGNER';
-
-    document.getElementById('rd-sidebar-content').style.display = isRD ? 'block' : 'none';
-    document.getElementById('wc-sidebar-content').style.display = isRD ? 'none' : 'block';
-    document.getElementById('rd-main-content').style.display = isRD ? 'block' : 'none';
-    document.getElementById('wc-main-content').style.display = isRD ? 'none' : 'block';
-
-    document.getElementById('btn-view-rd').classList.toggle('active', isRD);
-    document.getElementById('btn-view-wc').classList.toggle('active', !isRD);
-
-    if (!isInitial) {
-        if (isRD) {
-            rd_calculateAndRender();
-        } else {
-            wc_calculateAndRender();
-        }
-    }
-}
 
 function toggleTheme() {
     const newTheme = appState.theme === 'light' ? 'dark' : 'light';
@@ -114,19 +46,16 @@ function applyTheme(themeName) {
     appState.theme = themeName;
     document.documentElement.setAttribute('data-theme', themeName);
     localStorage.setItem('theme', themeName);
-    
+
     const btn = document.getElementById('btnThemeToggle');
     if(btn) {
-        btn.innerHTML = themeName === 'light' 
-            ? '<i class="fa-solid fa-moon"></i>' 
+        btn.innerHTML = themeName === 'light'
+            ? '<i class="fa-solid fa-moon"></i>'
             : '<i class="fa-solid fa-sun"></i>';
     }
 
-    // Redraw both SVGs because colors change
     rd_calculateAndRender();
-    wc_calculateAndRender();
 }
-
 /* --- MODAL SYSTEM --- */
 function showModal(title, message) {
     const modal = document.getElementById('customModal');
@@ -152,7 +81,7 @@ function closeModal() {
 // |                                                                                 |
 // ===================================================================================
 
-/* --- GESTIÓN DE PAREDES (RD) --- */
+/* --- GESTIÃ“N DE PAREDES (RD) --- */
 function rd_toggleWall(id) {
     const wall = appState.roomDesigner.walls.find(w => w.id === id);
     if (wall) {
@@ -220,7 +149,7 @@ function rd_renderWallControls() {
     }
 }
 
-/* --- GESTIÓN DE CARGAS (RD) --- */
+/* --- GESTIÃ“N DE CARGAS (RD) --- */
 function rd_addLoad(type) {
     if (!appState.roomDesigner.activeWallId) {
         showModal("Action Required", "Please select a wall first.");
@@ -469,7 +398,7 @@ function rd_exportReport() {
     window.print();
 }
 
-/* --- MOTOR DE CÁLCULO (RD) --- */
+/* --- MOTOR DE CÃLCULO (RD) --- */
 function rd_calculateAndRender() {
     rd_renderLoadList();
 
@@ -661,430 +590,4 @@ function rd_generateWallSVG(wall, items, forPrint) {
 }
 
 
-// ===================================================================================
-// |                                                                                 |
-// |                     WIREWAY CALCULATOR LOGIC (wc_ prefix)                       |
-// |                                                                                 |
-// ===================================================================================
 
-/* --- LÓGICA DEL FEEDER (WC) --- */
-function wc_toggleFeeder() {
-    appState.wirewayCalculator.isFeederEnabled = !appState.wirewayCalculator.isFeederEnabled;
-    const isActive = appState.wirewayCalculator.isFeederEnabled;
-    
-    const btn = document.getElementById('wc-btnFeederToggle');
-    if(btn) {
-        btn.className = `btn-toggle ${isActive ? 'active' : 'inactive'}`;
-        btn.innerText = isActive ? "ON" : "OFF";
-    }
-    
-    const content = document.getElementById('wc-feederContent');
-    if(content) content.classList.toggle('opacity-40', !isActive);
-    
-    const box = document.getElementById('wc-feederBox');
-    if(box) {
-        box.style.borderLeftColor = isActive ? "var(--blue-500)" : "var(--border-subtle)";
-    }
-
-    wc_calculateAndRender();
-}
-
-function wc_updateFeederType() {
-    const el = document.getElementById('wc-feederType');
-    if(!el) return;
-    const type = el.value;
-    appState.wirewayCalculator.feeder.type = type;
-
-    if (type === 'CT_CABINET' && !WC_CT_CABINET_OPTIONS.includes(appState.wirewayCalculator.feeder.amps)) {
-        appState.wirewayCalculator.feeder.amps = 600;
-    }
-
-    wc_renderFeederInputs();
-    wc_calculateAndRender();
-}
-
-function wc_updateFeederValue(field, value) {
-    let val;
-    if (field === 'sets') {
-        val = Math.max(1, parseInt(value) || 1);
-    } else {
-        val = parseFloat(value);
-        if (isNaN(val) || val < 0) val = 0;
-    }
-    appState.wirewayCalculator.feeder[field] = val;
-    wc_calculateAndRender();
-}
-
-function wc_renderFeederInputs() {
-    const container = document.getElementById('wc-feederDynamicFields');
-    if(!container) return;
-    
-    let html = '';
-    const { feeder } = appState.wirewayCalculator;
-    const isDirect = feeder.type === 'DIRECT';
-
-    if (isDirect) {
-        const conduitOptions = WC_CONDUIT_SIZES.map(s => `<option value="${s}" ${s === feeder.conduitSize ? 'selected' : ''}>${s}"</option>`).join('');
-        html = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
-            <div class="input-group"><label class="input-label">DIAM (IN)</label><select class="input-custom" onchange="wc_updateFeederValue('conduitSize', this.value)">${conduitOptions}</select></div>
-            <div class="input-group"><label class="input-label">SETS</label><input type="number" min="1" class="input-custom" value="${feeder.sets}" onchange="wc_updateFeederValue('sets', this.value)"></div>
-        </div>`;
-    } else {
-        const currentOptions = feeder.type === 'CT_CABINET' ? WC_CT_CABINET_OPTIONS : WC_AMP_OPTIONS;
-        const ampOptionsHtml = currentOptions.map(a => {
-            let label = `${a}A`;
-            if (feeder.type === 'CT_CABINET' && a === 800) label = '800A+';
-            return `<option value="${a}" ${a === feeder.amps ? 'selected' : ''}>${label}</option>`;
-        }).join('');
-        html = `<div class="input-group" style="margin-bottom: 1.25rem;"><label class="input-label">AMPERAGE</label><select class="input-custom" onchange="wc_updateFeederValue('amps', this.value)">${ampOptionsHtml}</select></div>`;
-    }
-
-    html += `
-    <div style="display: grid; grid-template-columns: ${isDirect ? '1fr 1fr 1fr' : '1fr 1fr'}; gap: 0.75rem;">
-        <div class="input-group"><label class="input-label">START GAP</label><div style="position:relative;"><input type="number" step="0.5" min="0" class="input-custom" style="padding-right: 1.5rem;" value="${feeder.startGap}" onchange="wc_updateFeederValue('startGap', this.value)"><span style="position:absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-muted); font-weight:700;">"</span></div></div>
-        ${isDirect ? `<div class="input-group"><label class="input-label">CONDUIT GAP</label><div style="position:relative;"><input type="number" step="0.5" min="0" class="input-custom" style="padding-right: 1.5rem;" value="${feeder.betweenGap}" onchange="wc_updateFeederValue('betweenGap', this.value)"><span style="position:absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-muted); font-weight:700;">"</span></div></div>` : ''}
-        <div class="input-group"><label class="input-label">GAP AFTER</label><div style="position:relative;"><input type="number" step="0.5" min="0" class="input-custom" style="padding-right: 1.5rem;" value="${feeder.gapAfter}" onchange="wc_updateFeederValue('gapAfter', this.value)"><span style="position:absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-muted); font-weight:700;">"</span></div></div>
-    </div>`;
-    container.innerHTML = html;
-}
-
-/* --- GESTIÓN DE CARGAS (WC) --- */
-function wc_addLoad(type) {
-    const defaultAmps = type === 'CT_CABINET' ? 600 : 200;
-    appState.wirewayCalculator.loads.push({ 
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 5), 
-        type, 
-        amps: defaultAmps, 
-        meterSize: 'SMALL',
-        isCustom: false,
-        customWidth: 10,
-        gapAfter: WC_DEFAULT_SPACING
-    });
-    wc_calculateAndRender();
-}
-
-function wc_removeLoad(id) {
-    appState.wirewayCalculator.loads = appState.wirewayCalculator.loads.filter(l => l.id !== id);
-    wc_calculateAndRender();
-}
-
-function wc_updateLoad(id, field, value) {
-    const load = appState.wirewayCalculator.loads.find(l => l.id === id);
-    if (load) {
-        if (field === 'meterSize') load[field] = value;
-        else if (field === 'gapAfter') {
-            let val = parseFloat(value);
-            load[field] = (isNaN(val) || val < 0) ? 0 : val;
-        } else {
-            load[field] = parseInt(value);
-        }
-        wc_calculateAndRender();
-    }
-}
-
-function wc_toggleCustomMode(id) {
-    const load = appState.wirewayCalculator.loads.find(l => l.id === id);
-    if (load) {
-        load.isCustom = !load.isCustom;
-        wc_calculateAndRender();
-    }
-}
-
-function wc_updateCustomWidth(id, value) {
-    const load = appState.wirewayCalculator.loads.find(l => l.id === id);
-    if (load) {
-        let val = parseFloat(value);
-        if (isNaN(val) || val < 0) val = 0;
-        load.customWidth = val;
-        wc_calculateAndRender();
-    }
-}
-
-function wc_renderLoadList() {
-    const container = document.getElementById('wc-loadListContainer');
-    if (!container) return;
-    document.getElementById('wc-itemsCount').innerText = `${appState.wirewayCalculator.loads.length} Active Loads`;
-
-    if (appState.wirewayCalculator.loads.length === 0) {
-        container.innerHTML = `<div style="padding: 3rem; text-align: center; color: var(--text-muted);"><i class="fa-solid fa-layer-group" style="font-size: 2.5rem; margin-bottom: 1rem; opacity:0.3;"></i><span style="font-weight: 700; font-size: 0.9rem; display:block;">NO LOADS ADDED</span><span style="font-size: 0.8rem;">Use the sidebar to add items</span></div>`;
-        return;
-    }
-
-    container.innerHTML = appState.wirewayCalculator.loads.map(l => {
-        let bgIcon, colorIcon;
-        if (appState.theme === 'dark') {
-            switch(l.type) {
-                case 'PANELBOARD': bgIcon = '#1e3a8a'; colorIcon = '#93c5fd'; break;
-                case 'DISCONNECT': bgIcon = '#064e3b'; colorIcon = '#6ee7b7'; break;
-                case 'METER': bgIcon = '#78350f'; colorIcon = '#fcd34d'; break;
-                case 'CT_CABINET': bgIcon = '#5b21b6'; colorIcon = '#c4b5fd'; break;
-            }
-        } else {
-            switch(l.type) {
-                case 'PANELBOARD': bgIcon = 'var(--blue-100)'; colorIcon = 'var(--blue-600)'; break;
-                case 'DISCONNECT': bgIcon = 'var(--emerald-100)'; colorIcon = 'var(--emerald-500)'; break;
-                case 'METER': bgIcon = 'var(--amber-100)'; colorIcon = 'var(--amber-500)'; break;
-                case 'CT_CABINET': bgIcon = '#f3e8ff'; colorIcon = '#9333ea'; break;
-            }
-        }
-
-        let mainControlLabel = 'Amps';
-        if (l.type === 'METER') mainControlLabel = 'Size';
-        if (l.isCustom) mainControlLabel = 'Width';
-
-        let mainControlInputHtml = '';
-        if (l.isCustom) {
-            mainControlInputHtml = `<div style="position:relative;"><input type="number" step="0.5" class="input-custom" style="padding-right: 1.5rem; width: 100px;" value="${l.customWidth}" onchange="wc_updateCustomWidth('${l.id}', this.value)"><span style="position:absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-muted); font-weight:700;">"</span></div>`;
-        } else {
-            if (l.type === 'METER') {
-                mainControlInputHtml = `<select class="input-custom" style="width: 100px; padding: 0 0.5rem;" onchange="wc_updateLoad('${l.id}', 'meterSize', this.value)"><option value="SMALL" ${l.meterSize === 'SMALL'?'selected':''}>SMALL</option><option value="LARGE" ${l.meterSize === 'LARGE'?'selected':''}>LARGE</option></select>`;
-            } else {
-                const availableAmps = l.type === 'PANELBOARD' ? WC_PANEL_AMPS_SORTED : l.type === 'DISCONNECT' ? WC_DISCONNECT_AMPS_SORTED : l.type === 'CT_CABINET' ? WC_CT_CABINET_OPTIONS : WC_AMP_OPTIONS;
-                const options = availableAmps.map(a => {
-                    let label = `${a}A`;
-                    if (l.type === 'CT_CABINET' && a === 800) label = '800A+';
-                    return `<option value="${a}" ${a === l.amps ? 'selected' : ''}>${label}</option>`;
-                }).join('');
-                mainControlInputHtml = `<select class="input-custom" style="width: 100px; padding: 0 0.5rem;" onchange="wc_updateLoad('${l.id}', 'amps', this.value)">${options}</select>`;
-            }
-        }
-        const mainControlHtml = `<div class="control-group"><label class="input-label">${mainControlLabel}</label>${mainControlInputHtml}</div>`;
-
-        const spacingAfterHtml = `
-            <div class="control-group">
-                <label class="input-label">Gap After</label>
-                <div style="position:relative;">
-                    <input type="number" step="0.5" min="0" class="input-custom" style="width: 80px; text-align:center; padding-right: 1.4rem;" 
-                    value="${l.gapAfter}" onchange="wc_updateLoad('${l.id}', 'gapAfter', this.value)">
-                    <span style="position:absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); font-size: 0.8rem; color: var(--text-secondary); font-weight:800; pointer-events: none;">"</span>
-                </div>
-            </div>`;
-
-        let buttonStyle = l.isCustom ? `background: #f3e8ff; border: 1px solid #d8b4fe;` : `background: var(--bg-input); border: 2px solid var(--border-subtle);`;
-        if (appState.theme === 'dark' && l.isCustom) { buttonStyle = `background: #4c1d95; border: 1px solid #a78bfa;`; }
-        let buttonIconColor = l.isCustom ? (appState.theme === 'dark' ? '#d8b4fe' : '#9333ea') : '#6366f1';
-        const buttonsHtml = `<div class="control-group-buttons"><button onclick="wc_toggleCustomMode('${l.id}')" title="Manual Size Override" style="width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; cursor: pointer; display:flex; align-items:center; justify-content:center; ${buttonStyle} color: ${buttonIconColor}; transition: 0.2s;"><i class="fa-solid fa-ruler-horizontal"></i></button><button onclick="wc_removeLoad('${l.id}')" class="btn-icon-only" style="width: 2.75rem; height: 2.75rem; display:flex; align-items:center; justify-content:center; font-size: 1rem; border: 1px solid var(--border-subtle); border-radius: 0.75rem;"><i class="fa-solid fa-times"></i></button></div>`;
-
-        return `
-        <div class="load-item" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; padding: 1.25rem; border-bottom: 1px solid var(--border-subtle);">
-            <div style="display: flex; gap: 1rem; align-items: center; min-width: 140px; margin-right: auto;"><div style="width: 3rem; height: 3rem; background: ${bgIcon}; color: ${colorIcon}; border-radius: 0.85rem; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.25rem;">${l.type.charAt(0)}</div><div><div style="font-weight: 800; font-size: 0.85rem; color: var(--text-primary);">${l.type}</div><div style="font-family: monospace; font-size: 0.7rem; color: var(--text-muted);">ID: ${l.id.slice(-3)}</div></div></div>
-            <div class="load-item-controls">
-                ${spacingAfterHtml}
-                ${mainControlHtml}
-                ${buttonsHtml}
-            </div>
-        </div>`;
-    }).join('');
-}
-
-/* --- EXPORTAR PDF (WC) --- */
-function wc_renderExportButton() {
-    const headerActions = document.getElementById('wc-headerActions');
-    if (headerActions && headerActions.innerHTML === '') {
-        const btn = document.createElement('button');
-        btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> PDF';
-        btn.style.cssText = `padding: 0.75rem 1.5rem; background: var(--text-primary); color: var(--bg-panel); border: none; border-radius: 0.75rem; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.6rem; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0, 0.15);`;
-        btn.onclick = wc_exportReport;
-        headerActions.appendChild(btn);
-    }
-}
-
-function wc_exportReport() {
-    const printArea = document.getElementById('printArea');
-    if (!printArea) return;
-
-    const totalVal = document.getElementById('wc-totalIn').innerText;
-    const totalFt = document.getElementById('wc-totalFt').innerText;
-    
-    let svgElement = document.getElementById('wc-svgContainer').querySelector('svg');
-    let svgContent = '';
-    if (svgElement) {
-        let clonedSvg = svgElement.cloneNode(true);
-        clonedSvg.removeAttribute('width');
-        clonedSvg.removeAttribute('height');
-        clonedSvg.style.width = '100%'; 
-        const bgRect = clonedSvg.querySelector('rect[fill="#1e293b"], rect[fill="#334155"], rect[fill="#e2e8f0"]');
-        if(bgRect) bgRect.setAttribute('fill', '#e2e8f0');
-        svgContent = clonedSvg.outerHTML;
-    }
-
-    const date = new Date().toLocaleDateString();
-    let itemsRows = '';
-    const { feeder, loads, isFeederEnabled } = appState.wirewayCalculator;
-    
-    if (isFeederEnabled) {
-        let desc = (feeder.type === 'DIRECT') ? `Conduit: ${feeder.conduitSize}" (${feeder.sets} sets)` : `${feeder.amps} Amps`;
-        if (feeder.type === 'CT_CABINET' && feeder.amps === 800) desc = '800A+';
-        let fW = (feeder.type === 'DIRECT') ? (feeder.conduitSize * feeder.sets) + (feeder.betweenGap * (Math.max(0, feeder.sets - 1))) : (feeder.type === 'DISCONNECT' ? (WC_DISCONNECT_DATA[feeder.amps] || 0) : (feeder.amps <= 600 ? 32 : 48));
-        let gapCellContent = `${feeder.gapAfter.toFixed(1)}"`;
-        if (feeder.type === 'DIRECT' && feeder.sets > 1) {
-            gapCellContent += `<br><small style="color:#64748b; font-size: 9pt;">Conduit Gap: ${feeder.betweenGap.toFixed(1)}"</small>`;
-        }
-        itemsRows += `<tr><td><strong>MAIN FEEDER</strong></td><td>${feeder.type}</td><td>${desc}</td><td>${fW.toFixed(1)}"</td><td>${gapCellContent}</td></tr>`;
-    }
-
-    loads.forEach((l, index) => {
-        let desc = l.isCustom ? 'Manual Size' : (l.type === 'METER' ? l.meterSize : l.amps + 'A');
-        if (l.type === 'CT_CABINET' && l.amps === 800) desc = '800A+';
-        let widthDisplay;
-        if (l.isCustom) widthDisplay = l.customWidth;
-        else if (l.type === 'PANELBOARD') widthDisplay = WC_PANEL_DATA[l.amps] || 0;
-        else if (l.type === 'DISCONNECT') widthDisplay = WC_DISCONNECT_DATA[l.amps] || 0;
-        else if (l.type === 'CT_CABINET') widthDisplay = l.amps <= 600 ? 32 : 48;
-        else widthDisplay = (l.meterSize === 'LARGE' ? 12 : 9.6);
-        itemsRows += `<tr><td>${index + 1}. ${l.type}</td><td>${l.isCustom ? 'Custom' : 'Standard'}</td><td>${desc}</td><td>${parseFloat(widthDisplay).toFixed(1)}"</td><td>${l.gapAfter.toFixed(1)}"</td></tr>`;
-    });
-
-    const reportHTML = `
-        <div style="padding: 2rem; max-width: 100%; margin: 0 auto; font-family: 'Inter', sans-serif;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #333; padding-bottom: 1rem; margin-bottom: 2rem;"><div><h1 style="margin:0; font-size: 1.5rem; color: #1e293b;">Wireway Calculation Report</h1><p style="margin:0.5rem 0 0; color: #64748b;">Generated on ${date}</p></div><div style="text-align:right;"><div style="font-size: 0.8rem; text-transform:uppercase; color: #64748b; font-weight:700;">Total Length</div><div style="font-size: 2.5rem; font-weight: 900; color: #fb5a3a;">${totalVal}"</div><div style="font-size: 1rem; color: #64748b; font-weight:600;">${totalFt}</div></div></div>
-            <div style="margin-bottom: 2rem;"><h3 style="color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Visual Layout</h3><div style="margin-top: 1rem; padding: 1rem;">${svgContent}</div></div>
-            <div><h3 style="color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Load Details & Dimensions</h3><table class="print-table"><thead><tr><th>Item Type</th><th>Config</th><th>Rating/Size</th><th>Width</th><th>Gap After</th></tr></thead><tbody>${itemsRows}</tbody></table></div>
-            <div style="margin-top: 4rem; text-align: center; color: #cbd5e1; font-size: 0.8rem;"><p>Brightronix Wireway Calculator</p></div>
-        </div>`;
-    printArea.innerHTML = reportHTML;
-    window.print();
-}
-
-/* --- MOTOR DE CÁLCULO (WC) --- */
-function wc_calculateAndRender() {
-    wc_renderLoadList();
-    const { feeder, loads, isFeederEnabled } = appState.wirewayCalculator;
-
-    let fW = 0;
-    if (isFeederEnabled) {
-        if (feeder.type === 'DIRECT') fW = (feeder.conduitSize * feeder.sets) + (feeder.betweenGap * (Math.max(0, feeder.sets - 1)));
-        else if (feeder.type === 'DISCONNECT') fW = WC_DISCONNECT_DATA[feeder.amps] || 0;
-        else fW = feeder.amps <= 600 ? 32 : 48;
-    }
-    
-    const calculatedLoads = loads.map(l => {
-        let w = 0;
-        if (l.isCustom) w = l.customWidth;
-        else if (l.type === 'PANELBOARD') w = WC_PANEL_DATA[l.amps] || 0;
-        else if (l.type === 'DISCONNECT') w = WC_DISCONNECT_DATA[l.amps] || 0;
-        else if (l.type === 'CT_CABINET') w = l.amps <= 600 ? 32 : 48;
-        else w = (l.meterSize === 'LARGE' ? 12 : 9.6);
-        return { ...l, width: w };
-    });
-
-    let total = 0;
-    if (isFeederEnabled) {
-        total += feeder.startGap + fW + feeder.gapAfter;
-    } else if (calculatedLoads.length > 0) {
-        total += WC_DEFAULT_SPACING;
-    }
-
-    calculatedLoads.forEach(l => {
-        total += l.width + l.gapAfter;
-    });
-
-    if (total === 0 && !isFeederEnabled) total = WC_DEFAULT_SPACING * 2;
-
-    const elIn = document.getElementById('wc-totalIn');
-    const elFt = document.getElementById('wc-totalFt');
-    if(elIn) elIn.innerText = total.toFixed(1);
-    if(elFt) elFt.innerText = (total / 12).toFixed(2) + " FT";
-
-    wc_drawVisualizer(fW, calculatedLoads, total);
-}
-
-function wc_drawVisualizer(feederWidth, calcLoads, totalWidth) {
-    const container = document.getElementById('wc-svgContainer');
-    if(!container) return;
-
-    const scale = 5, rectHeight = 60, svgWidth = (totalWidth * scale) + 50;
-    const wirewayFill = appState.theme === 'light' ? '#e2e8f0' : '#334155';
-    const wirewayStroke = 'var(--accent-primary)';
-    
-    let svgContent = `<svg width="${svgWidth}" height="150" viewBox="0 0 ${svgWidth} 150" xmlns="http://www.w3.org/2000/svg" style="max-height: 150px; flex-shrink: 0; margin: auto;"><rect x="0" y="30" width="${Math.max(totalWidth * scale, svgWidth - 50)}" height="80" fill="${wirewayFill}" stroke="${wirewayStroke}" stroke-width="2" rx="8" />`;
-    let currentX = 0;
-    const { feeder, isFeederEnabled } = appState.wirewayCalculator;
-
-    // --- MAIN FEEDER ---
-    if (isFeederEnabled && feederWidth > 0) {
-        currentX = feeder.startGap;
-        let feederFill = '#2563eb'; // Default blue for DIRECT
-        let feederLabel = 'MAIN';
-        let feederSubLabel = '';
-
-        if (feeder.type === 'DISCONNECT') {
-            feederFill = '#10b981'; // Green
-            feederLabel = 'DISC';
-            feederSubLabel = `${feeder.amps}A`;
-        } else if (feeder.type === 'CT_CABINET') {
-            feederFill = '#8b5cf6'; // Purple
-            feederLabel = 'CT';
-            feederSubLabel = `${feeder.amps}A`;
-            if (feeder.amps === 800) feederSubLabel = '800A+';
-        } else { // DIRECT
-            feederLabel = 'FEED';
-            feederSubLabel = `${feeder.sets}x ${feeder.conduitSize}"`;
-        }
-        
-        const feederText = `<text x="${feederWidth * scale / 2}" y="${rectHeight/2 - 7}" text-anchor="middle" dominant-baseline="central" fill="white" font-size="10" font-weight="bold" font-family="sans-serif">${feederLabel}</text>
-                            <text x="${feederWidth * scale / 2}" y="${rectHeight/2 + 7}" text-anchor="middle" dominant-baseline="central" fill="white" font-size="9" font-weight="bold" font-family="sans-serif">${feederSubLabel}</text>`;
-        
-        svgContent += `<g transform="translate(${currentX * scale}, 40)">
-                        <rect width="${feederWidth * scale}" height="${rectHeight}" fill="${feederFill}" rx="4" />
-                        ${feederText}
-                        <text x="${(feederWidth * scale) - 5}" y="${rectHeight - 5}" text-anchor="end" fill="white" font-size="11" font-weight="900" font-family="sans-serif" opacity="0.8">${parseFloat(feederWidth).toFixed(1)}"</text>
-                       </g>`;
-        currentX += feederWidth;
-    } else if (calcLoads.length > 0) {
-        currentX = WC_DEFAULT_SPACING;
-    }
-
-    // --- LOADS ---
-    calcLoads.forEach((l, index) => {
-        let gapBefore = 0;
-        if (index === 0 && isFeederEnabled) gapBefore = feeder.gapAfter;
-        else if (index > 0) gapBefore = calcLoads[index - 1].gapAfter;
-        
-        currentX += gapBefore;
-
-        let fill = '#64748b';
-        let label = l.type.substring(0,5);
-        let subLabel = '';
-
-        switch(l.type) {
-            case 'PANELBOARD': 
-                fill = '#3b82f6'; 
-                label = 'PANEL';
-                subLabel = `${l.amps}A`;
-                break;
-            case 'DISCONNECT': 
-                fill = '#10b981'; 
-                label = 'DISC';
-                subLabel = `${l.amps}A`;
-                break;
-            case 'METER': 
-                fill = '#f59e0b'; 
-                label = 'METER';
-                subLabel = l.meterSize.substring(0,1);
-                break;
-            case 'CT_CABINET': 
-                fill = '#8b5cf6'; // Purple, consistent with WC list
-                label = 'CT';
-                subLabel = `${l.amps}A`;
-                if (l.amps === 800) subLabel = '800A+';
-                break;
-        }
-
-        const itemText = `<text x="${l.width * scale / 2}" y="${rectHeight/2 - 7}" text-anchor="middle" dominant-baseline="central" fill="white" font-size="10" font-weight="bold" font-family="sans-serif">${label}</text>
-                          <text x="${l.width * scale / 2}" y="${rectHeight/2 + 7}" text-anchor="middle" dominant-baseline="central" fill="white" font-size="9" font-weight="bold" font-family="sans-serif">${subLabel}</text>`;
-
-        let stroke = l.isCustom ? (appState.theme === 'light' ? 'stroke="#9333ea" stroke-width="2"' : 'stroke="#d8b4fe" stroke-width="2"') : '';
-        
-        svgContent += `<g transform="translate(${currentX * scale}, 40)">
-                        <rect width="${l.width * scale}" height="${rectHeight}" fill="${fill}" rx="4" ${stroke} />
-                        ${itemText}
-                        <text x="${(l.width * scale) - 5}" y="${rectHeight - 5}" text-anchor="end" fill="white" font-size="11" font-weight="900" font-family="sans-serif" opacity="0.8">${l.width.toFixed(1)}"</text>
-                       </g>`;
-        currentX += l.width;
-    });
-
-    svgContent += '</svg>';
-    container.innerHTML = svgContent;
-}
